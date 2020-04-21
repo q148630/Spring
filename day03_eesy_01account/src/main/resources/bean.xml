@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+<!--    配置代理的 service-->
+    <bean id="proxyAccountService" factory-bean="beanfactory" factory-method="getAccountService"></bean>
+
+<!--    配置 beanfactory-->
+    <bean id="beanfactory" class="org.example.factory.BeanFactory">
+<!--        注入 service-->
+        <property name="accountService" ref="accountService"></property>
+<!--        注入事務管理器-->
+        <property name="txManager" ref="txManager"></property>
+    </bean>
+
+    <!--    配置 Service-->
+    <bean id="accountService" class="org.example.service.impl.AccountServiceImpl">
+        <!--        注入 dao-->
+        <property name="accountDao" ref="accountDao"></property>
+    </bean>
+
+    <!--    配置 Dao 物件-->
+    <bean id="accountDao" class="org.example.dao.impl.AccountDaoImpl">
+        <!--        注入 QueryRunner-->
+        <property name="runner" ref="runner"></property>
+<!--        注入 ConnectionUtils-->
+        <property name="connectionUtils" ref="connectionUtils"></property>
+    </bean>
+
+    <!--    配置 QueryRunner 物件-->
+    <bean id="runner" class="org.apache.commons.dbutils.QueryRunner" scope="prototype"></bean>
+
+    <!--    配置數據源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <!--        連接資料庫的必備信息-->
+        <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+        <property name="jdbcUrl"
+                  value="jdbc:mysql://localhost:3306/eesy?useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=UTC"></property>
+        <property name="user" value="admin"></property>
+        <property name="password" value="admin8857810"></property>
+    </bean>
+
+<!--    配置 Connection 的工具類 ConnectionUtils-->
+    <bean id="connectionUtils" class="org.example.utils.ConnectionUtils">
+<!--        注入數據源-->
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+<!--    配置事務管理器-->
+    <bean id="txManager" class="org.example.utils.TransactionManager">
+        <!--        注入 ConnectionUtils-->
+        <property name="connectionUtils" ref="connectionUtils"></property>
+    </bean>
+
+</beans>

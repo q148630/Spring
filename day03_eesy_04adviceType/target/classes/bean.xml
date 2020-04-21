@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--    配置 spring 的 Ioc，把 service 物件配置進來-->
+    <bean id="accountService" class="org.example.service.impl.AccountServiceImpl"></bean>
+
+    <!--    配置 Logger 類-->
+    <bean id="logger" class="org.example.util.Logger"></bean>
+
+    <!--    配置 AOP-->
+    <aop:config>
+        <!--            配置切入點表達式，id屬性用於指定表達式的唯一標識，expression屬性用於指定表達式內容
+                            此標籤寫在 aop:aspect 標籤內部只能當前切面使用。
+                            它還可以寫在 aop:aspect 外面，此時就變成了所有切面可用，但是必須在放在 aop:aspect 之前
+            -->
+        <aop:pointcut id="pt1" expression="execution(* org.example.service.impl.*.*(..))"/>
+
+        <!--        配置切面-->
+        <aop:aspect id="logAdvice" ref="logger">
+            <!--            配置前置通知，在切入點方法執行之前執行-->
+<!--            <aop:before method="beforePrintLog" pointcut-ref="pt1"></aop:before>-->
+
+            <!--            配置後置通知，在切入點方法正常執行之後執行，它和異常通知永遠只能執行一個-->
+<!--            <aop:after-returning method="afterReturningPrintLog"-->
+<!--                                 pointcut-ref="pt1"></aop:after-returning>-->
+
+            <!--            配置異常通知，在切入點方法執行產生異常之後執行，它和後置通知永遠只能執行一個-->
+<!--            <aop:after-throwing method="afterThrowingPrintLog"-->
+<!--                                pointcut-ref="pt1"></aop:after-throwing>-->
+
+            <!--            配置最終通知，無論切入點方法是否正常執行它都會在其後面執行-->
+<!--            <aop:after method="afterPrintLog" pointcut-ref="pt1"></aop:after>-->
+
+<!--            配置環繞通知，詳細的註解請看 Logger 類中-->
+            <aop:around method="aroundPrintLog" pointcut-ref="pt1"></aop:around>
+        </aop:aspect>
+
+    </aop:config>
+
+</beans>

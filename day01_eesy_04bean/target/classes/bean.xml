@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!--    把物件的建立交給 Spring 管理-->
+    <!--    Spring 對 bean 的管理細節
+                1. 建立 bean 的三種方式
+                2. bean 物件的作用範圍
+                3. bean 物件的生命週期
+    -->
+
+    <!--    建立 Bean 的三種方式-->
+
+    <!--    第一種方式，使用默認構造函數建立
+                在 spring 的配置文件中使用 bean 標籤，配給 id 和 class 屬性之後，且沒有其他屬性和標籤時，
+                採用的就是默認構造函數建立 bean 物件，此時如果類中沒有默認構造函數，則物件無法建立。
+        <bean id="accountService" class="org.example.service.impl.AccountServiceImpl"></bean>
+    -->
+
+    <!--    第二種方式，使用普通工廠中的方法建立物件(使用某個類中的方法建立物件，並存入 spring 容器)
+        <bean id="instanceFactory" class="org.example.factory.InstanceFactory"></bean>
+        <bean id="accountService" factory-bean="instanceFactory" factory-method="getAccountService"></bean>
+    -->
+
+    <!--    第三種方式，使用工廠中的靜態方法建立物件(使用某個類中的靜態方法建立物件，並存入 srping 容器)
+        <bean id="accountService" class="org.example.factory.StaticFactory" factory-method="getAccountService"></bean>
+    -->
+
+    <!--    bean 的作用範圍調整
+            bean 標籤的 scope 屬性，
+                作用: 用於指定 bean 的作用範圍
+                取值:  常用的就是單例的和多例的
+                    singleton: 單例的(默認值)
+                    prototype: 多例的
+                    request: 作用於 web 應用的請求範圍
+                    session: 作用於 web 應用的會話範圍
+                    global-session: 作用於集群環境的會話範圍(全域會話範圍)，當不是集群環境時，它就是 session
+        <bean id="accountService" class="org.example.service.impl.AccountServiceImpl" scope="prototype"></bean>
+    -->
+
+    <!--    bean 物件的生命週期
+                單例物件
+                    出生: 當容器建立時物件出生
+                    活著: 只要容器還在，物件一直活著
+                    死亡: 容器銷毀，物件死亡
+                    總結: 單例物件的生命週期和容器相同
+                多例物件
+                    出生:
+                    活著:
+                    死亡:
+    -->
+    <bean id="accountService" class="org.example.service.impl.AccountServiceImpl" scope="prototype" init-method="init"
+          destroy-method="destroy"></bean>
+</beans>

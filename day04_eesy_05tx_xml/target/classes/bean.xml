@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        https://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--    配置業務層-->
+    <bean id="accountService" class="org.example.service.impl.AccountServiceImpl">
+        <property name="accountDao" ref="accountDao"></property>
+    </bean>
+
+<!--    配置帳戶的持久層-->
+    <bean id="accountDao" class="org.example.dao.impl.AccountDaoImpl">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+<!--    配置數據源-->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/eesy?useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=UTC"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="admin8857810"></property>
+    </bean>
+
+
+<!--    spring 中基於 XML 的聲明式事務控制配置步驟
+        1. 配置事務管理器
+        2. 配置事務的通知
+                此時我們需要導入事務的約束: tx 名稱空間和約束，同時也需要 aop 的
+                使用 tx:advice 標籤配置事務通知
+                    屬性:
+                        id: 給事務通知一個唯一標識
+                        transaction-manager: 給事務通知提供一個事務管理器引用
+        3. 配置 AOP 中的通用切入點表達式
+        4. 建立事務通知和切入點表達式的對應關係
+        5. 配置事務的屬性
+                是在事務的通知 tx:advice 標籤的內部
+-->
+<!--    配置事務管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+<!--    配置事務的通知-->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+<!--        配置事務的屬性
+                isolation: 用於指定事務的隔離級別。默認值是 DEFAULT，表示使用資料庫的默認隔離級別
+                propagation: 用於指定事務的傳播行為。默認值是 REQUIRED，表示一定會有事務，增刪改的選擇。查詢方法可以選擇 SUPPORTS。
+                read-only: 用於指定事務是否只讀。只有查詢方法才能設置為 true，默認值是 false，表示讀寫。
+                timeout: 用於指定事務的超時時間。默認值是 -1，表示永不超時，如果指定了數值，以秒為單位。
+                rollback-for: 用於指定一個異常，當產生該異常時，事務回滾，產生其他異常時，事務不回滾。沒有默認值，表示任何異常都回滾。
+                no-rollback-for: 用於指定一個異常，當產生該異常時，事務不回滾，產生其他異常時，事務回滾。沒有默認值，表示任何異常都不回滾。
+-->
+        <tx:attributes>
+            <tx:method name="*" propagation="REQUIRED" read-only="false"/>
+            <tx:method name="find*" propagation="SUPPORTS" read-only="true"></tx:method>
+        </tx:attributes>
+    </tx:advice>
+
+<!--    配置 aop-->
+    <aop:config>
+<!--        配置切入點表達式-->
+        <aop:pointcut id="pt1" expression="execution(* org.example.service.impl.*.*(..))"/>
+<!--        建立切入點表達式和事務通知的對應關係-->
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="pt1"></aop:advisor>
+    </aop:config>
+
+</beans>

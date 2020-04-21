@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+<!--    spring 中的依賴注入
+        依賴注入:
+            Dependency Injection
+        IOC 的作用:
+            降低程式間的耦合 (依賴關係)
+        依賴關係的管理:
+            以後都交給 spring 來維護
+        在當前類別需要用到其他類的物件，由 spring 為我們提供，我們只需要在配置文件中說明
+        依賴關係的維護:
+            就稱之為依賴注入
+         依賴注入:
+            能注入的數據，有三類
+                基本類型和 String
+                其他的 bean 類型(在配置文件中或者註解配置過的 bean)
+                複雜類型 / 集合類型
+            注入的方式，有三種
+                第一種，使用構造函數提供
+                第二種，使用 set 方法提供
+                第三種，使用註解提供(明天的內容)
+-->
+
+<!--    構造函數注入
+        使用的標籤: constructor-arg
+        標籤出現的位置，bean 標籤的內部
+        標籤中的屬性
+            type: 用於指定要注入的數據的數據類型，該數據類型也是構造函數中某個或某些參數的類型
+            index: 用於指定要注入的數據給構造函數中指定索引位置的參數賦值，索引的位置是從 0 開始
+            name: 用於指定給構造函數中指定名稱的參數賦值 (常用的)
+            ============== 以上三個用於指定給構造函數中哪個參數賦值 ======================================
+            value: 用於提供基本類型和 String 類型的數據
+            ref: 用於指定其他的 bean 類型數據，它指的就是在 spring 的 Ioc 核心容器中出現過的 bean 物件
+
+        優勢:
+            在獲取 bean 物件時，注入數據是必須的操作，否則物件無法建立成功
+        弊端:
+            改變了 bean 物件的實例化方式，使我們在建立物件時，如果用不到這些數據，也必須提供
+-->
+    <bean id="accountService" class="org.example.service.impl.AccountServiceImpl">
+        <constructor-arg name="name" value="測試名"></constructor-arg>
+        <constructor-arg name="age" value="18"></constructor-arg>
+        <constructor-arg name="birthday" ref="now"></constructor-arg>
+    </bean>
+
+<!--    配置一個日期物件-->
+    <bean id="now" class="java.util.Date"></bean>
+
+
+<!--    set 方法注入    (更常用的方式)
+        涉及的標籤: property
+        出現的位置: bean 標籤的內部
+        標籤的屬性:
+            name: 用於指定注入時所調用的 set 方法名稱
+            value: 用於提供基本類型和 String 類型的數據
+            ref: 用於指定其他的 bean 類型數據，它指的就是在 spring 的 Ioc 核心容器中出現過的 bean 物件
+
+        優勢:
+            建立物件時沒有明確的限制，可以直接使用默認構造函數
+        弊端:
+            如果有某個成員必須有值，則獲取物件是有可能 set 方法沒有執行
+-->
+    <bean id="accountService2" class="org.example.service.impl.AccountServiceImpl2">
+        <property name="name" value="test"></property>
+        <property name="age" value="21"></property>
+        <property name="birthday" ref="now"></property>
+    </bean>
+
+
+<!--    複雜類型的注入 / 集合類型的注入
+        用於給 List 結構集合注入的標籤:
+            list array set
+        用於給 Map 結構集合注入的標籤:
+            map props
+        結構相同，標籤可以互換
+-->
+    <bean id="accountService3" class="org.example.service.impl.AccountServiceImpl3">
+        <property name="myStrs">
+            <array>
+                <value>AAA</value>
+                <value>BBB</value>
+                <value>CCC</value>
+            </array>
+        </property>
+        <property name="myList">
+            <list>
+                <value>AAA</value>
+                <value>BBB</value>
+                <value>CCC</value>
+            </list>
+        </property>
+        <property name="mySet">
+            <set>
+                <value>AAA</value>
+                <value>BBB</value>
+                <value>CCC</value>
+            </set>
+        </property>
+        <property name="myMap">
+            <map>
+                <entry key="testA" value="aaa"></entry>
+                <entry key="testB">
+                    <value>BBB</value>
+                </entry>
+            </map>
+        </property>
+        <property name="myProps">
+            <props>
+                <prop key="testC">ccc</prop>
+                <prop key="testD">ddd</prop>
+            </props>
+        </property>
+    </bean>
+    
+</beans>

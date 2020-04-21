@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+
+<!--    告知 spring 在建立容器時要掃描的 package-->
+    <context:component-scan base-package="org.example"></context:component-scan>
+
+<!--    配置 QueryRunner 物件-->
+    <bean id="runner" class="org.apache.commons.dbutils.QueryRunner" scope="prototype">
+<!--        注入數據源-->
+        <constructor-arg name="ds" ref="dataSource"></constructor-arg>
+    </bean>
+
+<!--    配置數據源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+<!--        連接資料庫的必備信息-->
+        <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/eesy?useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=UTC"></property>
+        <property name="user" value="admin"></property>
+        <property name="password" value="admin8857810"></property>
+    </bean>
+</beans>

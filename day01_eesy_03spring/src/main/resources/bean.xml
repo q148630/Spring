@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+<!--    把物件的建立交給 Spring 管理-->
+    <bean id="accountService" class="org.example.service.impl.AccountServiceImpl"></bean>
+
+    <bean id="accountDao" class="org.example.dao.impl.AccountDaoImpl"></bean>
+</beans>

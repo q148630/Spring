@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+<!--    配置 spring 的 Ioc，把 service 物件配置進來-->
+    <bean id="accountService" class="org.example.service.impl.AccountServiceImpl"></bean>
+
+<!--    spring 中基於 XML 的 AOP 配置步驟
+        1. 把通知 Bean 也交給 spring 來管理
+        2. 使用 aop:config 標籤表明開始 AOP 的配置
+        3. 使用 aop:aspect 標籤表明配置切面
+                id 屬性: 是給切面提供一個唯一標識
+                ref 屬性: 是指定通知類的 bean 的 id
+        4. 在 aop:aspect 標籤的內部使用對應標籤來配置通知的類型
+                我們現在範例是讓 printLog 方法在切入點方法執行之前執行，所以是前置通知
+                aop:before: 表示配置前置通知
+                    method 屬性: 用於指定 Logger 類中哪個方法是前置通知
+                    pointcut 屬性: 用於指定切入點表達式，該表達式的含義指的是對業務層中哪些方法增強
+
+           切入點表達式的寫法:
+                關鍵字: execution(表達式)
+                表達式:
+                    訪問修飾符 返回值 包名.包名.包名...類名.方法名(參數列表)
+                標準的表達式寫法:
+                    public void org.example.service.impl.AccountServiceImpl.saveAccount()
+                訪問修飾符可以省略
+                    void org.example.service.impl.AccountServiceImpl.saveAccount()
+                返回值可以使用通配符，表示任意返回值
+                    * org.example.service.impl.AccountServiceImpl.saveAccount()
+                包名可以使用通配符，表示任意包，但是有幾個包，就需要寫幾個 *
+                    * *.*.*.*.AccountServiceImpl.saveAccount()
+                包名可以使用 .. 表示當前包及其子包
+                    * *..AccountServiceImpl.saveAccount()
+                類名和方法名都可以使用 * 來實現通配
+                    * *..*.*()
+                參數列表
+                    可以直接寫參數類型
+                        基本類型直接寫名稱:         int
+                        引用類型寫包名.類名的方式:  java.lang.String
+                    可以使用通配符表示任意類型，但是必須有參數
+                    可以使用 .. 表示有無參數均可，有參數可以是任意類型
+                全通配寫法:
+                    * *..*.*(..)
+
+                實際開發中切入點表達式的通常寫法:
+                    切到業務層實現類下的所有方法
+                        * org.example.service.impl.*.*(..)
+-->
+
+<!--    配置 Logger 類-->
+    <bean id="logger" class="org.example.util.Logger"></bean>
+
+<!--    配置 AOP-->
+    <aop:config>
+<!--        配置切面-->
+        <aop:aspect id="logAdvice" ref="logger">
+<!--            配置通知的類型，並且建立通知方法和切入點方法的關聯-->
+            <aop:before method="printLog" pointcut="execution(* org.example.service.impl.*.*(..))"></aop:before>
+        </aop:aspect>
+    </aop:config>
+
+</beans>

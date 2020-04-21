@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <!--    配置 Service-->
+    <bean id="accountService" class="org.example.service.impl.AccountServiceImpl">
+        <!--        注入 dao-->
+        <property name="accountDao" ref="accountDao"></property>
+    </bean>
+
+    <!--    配置 Dao 物件-->
+    <bean id="accountDao" class="org.example.dao.impl.AccountDaoImpl">
+        <!--        注入 QueryRunner-->
+        <property name="runner" ref="runner"></property>
+        <!--        注入 ConnectionUtils-->
+        <property name="connectionUtils" ref="connectionUtils"></property>
+    </bean>
+
+    <!--    配置 QueryRunner 物件-->
+    <bean id="runner" class="org.apache.commons.dbutils.QueryRunner" scope="prototype"></bean>
+
+    <!--    配置數據源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <!--        連接資料庫的必備信息-->
+        <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+        <property name="jdbcUrl"
+                  value="jdbc:mysql://localhost:3306/eesy?useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=UTC"></property>
+        <property name="user" value="admin"></property>
+        <property name="password" value="admin8857810"></property>
+    </bean>
+
+    <!--    配置 Connection 的工具類 ConnectionUtils-->
+    <bean id="connectionUtils" class="org.example.utils.ConnectionUtils">
+        <!--        注入數據源-->
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!--    配置事務管理器-->
+    <bean id="txManager" class="org.example.utils.TransactionManager">
+        <!--        注入 ConnectionUtils-->
+        <property name="connectionUtils" ref="connectionUtils"></property>
+    </bean>
+
+    <!--    配置 aop-->
+    <aop:config>
+<!--        配置通用切入點表達式-->
+        <aop:pointcut id="pt1" expression="execution(* org.example.service.impl.*.*(..))"/>
+        <aop:aspect id="txAdvice" ref="txManager">
+            <!--            配置前置通知，開啟事務-->
+            <aop:before method="beginTransaction" pointcut-ref="pt1"></aop:before>
+            <!--            配置後置通知，提交事務-->
+            <aop:after-returning method="comit" pointcut-ref="pt1"></aop:after-returning>
+            <!--            配置異常通知，回滾事務-->
+            <aop:after-throwing method="rollback" pointcut-ref="pt1"></aop:after-throwing>
+            <!--            配置最終通知，釋放連接-->
+            <aop:after method="release" pointcut-ref="pt1"></aop:after>
+        </aop:aspect>
+    </aop:config>
+
+
+</beans>
